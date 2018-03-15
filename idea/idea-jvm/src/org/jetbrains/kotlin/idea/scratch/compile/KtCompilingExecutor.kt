@@ -46,6 +46,7 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtScript
+import org.jetbrains.kotlin.psi.psiUtil.getElementTextWithContext
 import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import java.io.File
 
@@ -180,8 +181,12 @@ class KtCompilingExecutor(file: ScratchFile) : ScratchExecutor(file) {
                     if (psiFile == scratchPsiFile) {
                         if (diagnostic.psiElement.containingFile == psiFile) {
                             val scratchExpression = file.findExpression(diagnostic.psiElement)
-                            handlers.forEach {
-                                it.handle(file, scratchExpression, ScratchOutput(errorText, ScratchOutputType.ERROR))
+                            if (scratchExpression == null) {
+                                LOG.error("Couldn't find expression to report error: ${diagnostic.psiElement.getElementTextWithContext()}")
+                                handlers.forEach { it.error(file, errorText) }
+
+                            } else {
+                                handlers.forEach { it.handle(file, scratchExpression, ScratchOutput(errorText, ScratchOutputType.ERROR)) }
                             }
                         } else {
                             handlers.forEach { it.error(file, errorText) }
@@ -201,12 +206,20 @@ class KtCompilingExecutor(file: ScratchFile) : ScratchExecutor(file) {
         handlers.forEach { it.onFinish(file) }
     }
 
-    private fun ScratchFile.findExpression(psiElement: PsiElement): ScratchExpression {
-        return findExpression(psiElement.getLineNumber(true), psiElement.getLineNumber(false))
+    private fun logAndError(message: String) {
+        LOG.error(message)
+        handlers.forEach { it.error(file, message) }
+        handlers.forEach { it.onFinish(file) }
     }
 
-    private fun ScratchFile.findExpression(lineStart: Int, lineEnd: Int): ScratchExpression {
-        return getExpressions().first { it.lineStart == lineStart && it.lineEnd == lineEnd }
+    private fun ScratchFile.findExpression(psiElement: PsiElement): ScratchExpression? {
+        val lineStart = psiElement.getLineNumber(true)
+        val lineEnd = psiElement.getLineNumber(false)
+        return getExpressions().firstOrNull { it.lineStart == lineStart || it.lineEnd == lineEnd }
+    }
+
+    private fun ScratchFile.findExpression(lineStart: Int, lineEnd: Int): ScratchExpression? {
+        return getExpressions().firstOrNull { it.lineStart == lineStart && it.lineEnd == lineEnd }
     }
 
     private inner class ProcessOutputParser {
@@ -234,18 +247,24 @@ class KtCompilingExecutor(file: ScratchFile) : ScratchExecutor(file) {
                 if (isGeneratedOutput(line)) {
                     val lineWoPrefix = line.removePrefix(KtScratchSourceFileProcessor.GENERATED_OUTPUT_PREFIX)
                     if (isResultEnd(lineWoPrefix)) {
-                        val (startLine, endLine) = extractLineInfoFrom(lineWoPrefix)
-                                ?: return error("Couldn't extract line info from line: $lineWoPrefix")
-                        val scratchExpression = file.findExpression(startLine, endLine)
-                        userOutput.forEach { output ->
-                            handlers.forEach {
-                                it.handle(file, scratchExpression, ScratchOutput(output, ScratchOutputType.OUTPUT))
-                            }
-                        }
+                        val extractedLineInfo = extractLineInfoFrom(lineWoPrefix)
+                        if (extractedLineInfo != null) {
+                            val (startLine, endLine) = extractedLineInfo
+                            val scratchExpression = file.findExpression(startLine, endLine)
+                            if (scratchExpression == null) {
+                                logAndError("Couldn't find expression with start line = $startLine, end line = $endLine")
+                            } else {
+                                userOutput.forEach { output ->
+                                    handlers.forEach {
+                                        it.handle(file, scratchExpression, ScratchOutput(output, ScratchOutputType.OUTPUT))
+                                    }
+                                }
 
-                        results.forEach { result ->
-                            handlers.forEach {
-                                it.handle(file, scratchExpression, ScratchOutput(result, ScratchOutputType.RESULT))
+                                results.forEach { result ->
+                                    handlers.forEach {
+                                        it.handle(file, scratchExpression, ScratchOutput(result, ScratchOutputType.RESULT))
+                                    }
+                                }
                             }
                         }
 
@@ -278,6 +297,7 @@ class KtCompilingExecutor(file: ScratchFile) : ScratchExecutor(file) {
                 } catch (e: NumberFormatException) {
                 }
             }
+            logAndError("Couldn't extract line info from line: $encoded")
             return null
         }
     }
