@@ -64,7 +64,7 @@ object CoroutineSupport {
             ?: LanguageFeature.Coroutines.defaultState
 
     fun getCompilerArgument(state: LanguageFeature.State): String = when (state) {
-        LanguageFeature.State.ENABLED -> "enable"
+        LanguageFeature.State.ENABLED, LanguageFeature.State.ENABLED_MANUALLY -> "enable"
         LanguageFeature.State.ENABLED_WITH_WARNING -> "warn"
         LanguageFeature.State.ENABLED_WITH_ERROR, LanguageFeature.State.DISABLED -> "error"
     }
@@ -186,7 +186,7 @@ class KotlinFacetSettings {
         }
         set(value) {
             compilerArguments!!.coroutinesState = when (value) {
-                LanguageFeature.State.ENABLED -> CommonCompilerArguments.ENABLE
+                LanguageFeature.State.ENABLED, LanguageFeature.State.ENABLED_MANUALLY -> CommonCompilerArguments.ENABLE
                 LanguageFeature.State.ENABLED_WITH_WARNING -> CommonCompilerArguments.WARN
                 LanguageFeature.State.ENABLED_WITH_ERROR, LanguageFeature.State.DISABLED -> CommonCompilerArguments.ERROR
             }

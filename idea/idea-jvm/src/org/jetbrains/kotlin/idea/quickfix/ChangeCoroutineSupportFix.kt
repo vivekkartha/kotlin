@@ -49,7 +49,7 @@ sealed class ChangeCoroutineSupportFix(
 
             KotlinCommonCompilerArgumentsHolder.getInstance(project).update {
                 coroutinesState = when (coroutineSupport) {
-                    LanguageFeature.State.ENABLED -> CommonCompilerArguments.ENABLE
+                    LanguageFeature.State.ENABLED, LanguageFeature.State.ENABLED_MANUALLY -> CommonCompilerArguments.ENABLE
                     LanguageFeature.State.ENABLED_WITH_WARNING -> CommonCompilerArguments.WARN
                     LanguageFeature.State.ENABLED_WITH_ERROR, LanguageFeature.State.DISABLED -> CommonCompilerArguments.ERROR
                 }
@@ -68,7 +68,7 @@ sealed class ChangeCoroutineSupportFix(
     companion object : KotlinIntentionActionsFactory() {
         fun getFixText(state: LanguageFeature.State): String {
             return when (state) {
-                LanguageFeature.State.ENABLED -> "Enable coroutine support"
+                LanguageFeature.State.ENABLED, LanguageFeature.State.ENABLED_MANUALLY -> "Enable coroutine support"
                 LanguageFeature.State.ENABLED_WITH_WARNING -> "Enable coroutine support (with warning)"
                 LanguageFeature.State.ENABLED_WITH_ERROR, LanguageFeature.State.DISABLED -> "Disable coroutine support"
             }
