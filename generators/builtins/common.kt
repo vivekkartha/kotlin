@@ -36,6 +36,16 @@ enum class PrimitiveType {
     }
 }
 
+enum class UnsignedType {
+    UBYTE,
+    USHORT,
+    UINT,
+    ULONG;
+
+    val capitalized: String get() = name.substring(0, 2) + name.substring(2).toLowerCase()
+    val asSigned: PrimitiveType = PrimitiveType.valueOf(name.substring(1))
+}
+
 enum class ProgressionKind {
     CHAR,
     INT,
