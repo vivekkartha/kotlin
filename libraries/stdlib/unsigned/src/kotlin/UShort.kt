@@ -99,6 +99,9 @@ public inline class UShort internal constructor(private val data: Short) : Compa
     /** Decrements this value. */
     public operator fun dec(): UShort = TODO()
 
+    /** Creates a range from this value to the specified [other] value. */
+    public operator fun rangeTo(other: UShort): UIntRange = UIntRange(this.toUInt(), other.toUInt())
+
     public fun toByte(): Byte = TODO()
     public fun toShort(): Short = TODO()
     public fun toInt(): Int = TODO()

@@ -99,6 +99,9 @@ public inline class UByte internal constructor(private val data: Byte) : Compara
     /** Decrements this value. */
     public operator fun dec(): UByte = TODO()
 
+    /** Creates a range from this value to the specified [other] value. */
+    public operator fun rangeTo(other: UByte): UIntRange = UIntRange(this.toUInt(), other.toUInt())
+
     public fun toByte(): Byte = TODO()
     public fun toShort(): Short = TODO()
     public fun toInt(): Int = TODO()
