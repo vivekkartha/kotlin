@@ -36,6 +36,14 @@ abstract class ScriptDependenciesLoader(
             project: Project,
             shouldNotifyRootsChanged: Boolean
         ) {
+            // Do not use AsyncScriptDependenciesLoader in tests because it can lead to leaking threads
+            // in case when test ends before loading is finished
+            // Use ScriptDependenciesManager.updateScriptDependenciesSynchronously in tests if you need an intermediate result
+            if (ApplicationManager.getApplication().isUnitTestMode) {
+                SyncScriptDependenciesLoader(file, scriptDef, project).updateDependencies()
+                return
+            }
+
             when (scriptDef.dependencyResolver) {
                 is AsyncDependenciesResolver,
                 is LegacyResolverWrapper -> AsyncScriptDependenciesLoader(file, scriptDef, project)
@@ -103,24 +111,16 @@ abstract class ScriptDependenciesLoader(
         }
     }
 
+    @Suppress("EXPERIMENTAL_FEATURE_WARNING")
     protected fun notifyRootsChanged() {
         if (!shouldNotifyRootsChanged) return
 
-        val rootsChangesRunnable = {
+        launch(EDT(project)) {
             runWriteAction {
                 if (project.isDisposed) return@runWriteAction
 
                 ProjectRootManagerEx.getInstanceEx(project)?.makeRootsChange(EmptyRunnable.getInstance(), false, true)
                 ScriptDependenciesModificationTracker.getInstance(project).incModificationCount()
-            }
-        }
-
-        val application = ApplicationManager.getApplication()
-        if (application.isUnitTestMode) {
-            rootsChangesRunnable()
-        } else {
-            launch(EDT(project)) {
-                rootsChangesRunnable()
             }
         }
     }

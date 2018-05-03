@@ -16,12 +16,14 @@
 
 package org.jetbrains.kotlin.idea.core.script
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.io.URLUtil
+import com.intellij.util.ui.UIUtil
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.idea.core.script.dependencies.SyncScriptDependenciesLoader
 import org.jetbrains.kotlin.script.ScriptDefinitionProvider
@@ -79,7 +81,9 @@ class ScriptDependenciesManager internal constructor(
         fun updateScriptDependenciesSynchronously(virtualFile: VirtualFile, project: Project) {
             with(getInstance(project)) {
                 val scriptDefinition = ScriptDefinitionProvider.getInstance(project).findScriptDefinition(virtualFile)!!
-                SyncScriptDependenciesLoader(virtualFile, scriptDefinition, project).updateDependencies()
+                SyncScriptDependenciesLoader(virtualFile, scriptDefinition, project, false).updateDependencies()
+                ApplicationManager.getApplication().isScriptDependenciesUpdaterDisabled = true
+                UIUtil.dispatchAllInvocationEvents()
             }
         }
     }
