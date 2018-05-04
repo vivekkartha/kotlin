@@ -93,12 +93,20 @@ task distJar(type: Jar) {
 }
 
 task coroutinesJar(type: Jar) {
-    baseName = 'kotlin-stdlib-coroutines'
     version = null
+    classifier = 'coroutines'
     manifestAttributes(manifest, project, 'Main', true)
     project.configure(manifest) { attributes 'Kotlin-Version': '1.3' }
     from("${rootDir}/dist/builtins")
     from sourceSets.coroutines.output
+}
+
+task unsignedJar(type: Jar) {
+    version = null
+    classifier = 'unsigned'
+    manifestAttributes(manifest, project, 'Main', true)
+    project.configure(manifest) { attributes 'Kotlin-Version': '1.3' }
+    from sourceSets.unsigned.output
 }
 
 sourcesJar {
@@ -141,12 +149,13 @@ dist {
     }
 }
 
-task coroutinesDist(type: Copy) {
+task experimentalJarsDist(type: Copy) {
     from coroutinesJar
+    from unsignedJar
     into distDir
 }
 
-dist.dependsOn coroutinesDist
+dist.dependsOn experimentalJarsDist
 
 task dexMethodCount(type: DexMethodCount) {
     from jar
