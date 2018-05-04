@@ -1,3 +1,4 @@
+// IGNORE_BACKEND: JS
 // KOTLIN_CONFIGURATION_FLAGS: ASSERTIONS_MODE=jvm
 // WITH_RUNTIME
 
@@ -8,62 +9,86 @@ interface Checker {
     fun checkFalseWithMessage(): Boolean
 }
 
-class ShouldBeDisabled: Checker {
+class ShouldBeDisabled : Checker {
     override fun checkTrue(): Boolean {
         var hit = false
         val l = { hit = true; true }
-        assert(l())
+        val local = fun() {
+            assert(l())
+        }
+        local()
         return hit
     }
 
     override fun checkFalse(): Boolean {
         var hit = false
         val l = { hit = true; false }
-        assert(l())
+        val local = fun() {
+            assert(l())
+        }
+        local()
         return hit
     }
 
     override fun checkTrueWithMessage(): Boolean {
         var hit = false
         val l = { hit = true; true }
-        assert(l()) { "BOOYA" }
+        val local = fun() {
+            assert(l()) { "BOOYA" }
+        }
+        local()
         return hit
     }
 
     override fun checkFalseWithMessage(): Boolean {
         var hit = false
         val l = { hit = true; false }
-        assert(l()) { "BOOYA" }
+        val local = fun() {
+            assert(l()) { "BOOYA" }
+        }
+        local()
         return hit
     }
 }
 
-class ShouldBeEnabled: Checker {
+class ShouldBeEnabled : Checker {
     override fun checkTrue(): Boolean {
         var hit = false
         val l = { hit = true; true }
-        assert(l())
+        val local = fun() {
+            assert(l())
+        }
+        local()
         return hit
     }
 
     override fun checkFalse(): Boolean {
         var hit = false
         val l = { hit = true; false }
-        assert(l())
+        val local = fun() {
+            assert(l())
+        }
+        local()
         return hit
     }
 
     override fun checkTrueWithMessage(): Boolean {
         var hit = false
         val l = { hit = true; true }
-        assert(l()) { "BOOYA" }
+        val local = fun() {
+            assert(l()) { "BOOYA" }
+        }
+        local()
         return hit
     }
 
     override fun checkFalseWithMessage(): Boolean {
         var hit = false
         val l = { hit = true; false }
-        assert(l()) { "BOOYA" }
+        val local = fun() {
+            assert(l()) { "BOOYA" }
+        }
+        local()
         return hit
     }
 }
