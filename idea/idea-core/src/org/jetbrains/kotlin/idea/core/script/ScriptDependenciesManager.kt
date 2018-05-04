@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.idea.core.script
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
@@ -82,7 +81,6 @@ class ScriptDependenciesManager internal constructor(
             with(getInstance(project)) {
                 val scriptDefinition = ScriptDefinitionProvider.getInstance(project).findScriptDefinition(virtualFile)!!
                 SyncScriptDependenciesLoader(virtualFile, scriptDefinition, project, false).updateDependencies()
-                ApplicationManager.getApplication().isScriptDependenciesUpdaterDisabled = true
                 UIUtil.dispatchAllInvocationEvents()
             }
         }

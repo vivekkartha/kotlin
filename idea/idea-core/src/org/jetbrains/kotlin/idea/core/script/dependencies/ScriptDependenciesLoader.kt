@@ -39,7 +39,7 @@ abstract class ScriptDependenciesLoader(
             // in case when test ends before loading is finished
             // Use ScriptDependenciesManager.updateScriptDependenciesSynchronously in tests if you need an intermediate result
             if (ApplicationManager.getApplication().isUnitTestMode) {
-                SyncScriptDependenciesLoader(file, scriptDef, project).updateDependencies()
+                SyncScriptDependenciesLoader(file, scriptDef, project, false).updateDependencies()
                 return
             }
 
