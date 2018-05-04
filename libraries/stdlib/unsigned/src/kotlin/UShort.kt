@@ -7,6 +7,8 @@
 
 package kotlin
 
+import kotlin.experimental.*
+
 public inline class UShort internal constructor(private val data: Short) : Comparable<UShort> {
 
     companion object {
@@ -102,19 +104,19 @@ public inline class UShort internal constructor(private val data: Short) : Compa
     /** Creates a range from this value to the specified [other] value. */
     public operator fun rangeTo(other: UShort): UIntRange = UIntRange(this.toUInt(), other.toUInt())
 
-    public fun toByte(): Byte = TODO()
-    public fun toShort(): Short = TODO()
-    public fun toInt(): Int = TODO()
-    public fun toLong(): Long = TODO()
+    public fun toByte(): Byte = data.toByte()
+    public fun toShort(): Short = data
+    public fun toInt(): Int = data.toInt() and 0xFFFF
+    public fun toLong(): Long = data.toLong() and 0xFFFF
 
-    public fun toUByte(): UByte = TODO()
-    public fun toUShort(): UShort = TODO()
-    public fun toUInt(): UInt = TODO()
-    public fun toULong(): ULong = TODO()
+    public fun toUByte(): UByte = data.toUByte()
+    public fun toUShort(): UShort = this
+    public fun toUInt(): UInt = data.toUInt()
+    public fun toULong(): ULong = data.toULong()
 
 }
 
-public fun Byte.toUShort(): UShort = UShort(this.toShort())
-public fun Short.toUShort(): UShort = UShort(this.toShort())
+public fun Byte.toUShort(): UShort = UShort(this.toShort() and 0xFF)
+public fun Short.toUShort(): UShort = UShort(this)
 public fun Int.toUShort(): UShort = UShort(this.toShort())
 public fun Long.toUShort(): UShort = UShort(this.toShort())
