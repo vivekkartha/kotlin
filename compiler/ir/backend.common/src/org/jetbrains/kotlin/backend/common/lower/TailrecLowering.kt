@@ -156,9 +156,9 @@ private class BodyTransformer(
     }
 }
 
-private fun IrValueParameterSymbol.suggestVariableName(): String = if (descriptor.name.isSpecial) {
-    val oldNameStr = descriptor.name.asString()
+private fun IrValueParameterSymbol.suggestVariableName(): String = if (owner.name.isSpecial) {
+    val oldNameStr = owner.name.asString()
     "$" + oldNameStr.substring(1, oldNameStr.length - 1)
 } else {
-    descriptor.name.identifier
+    owner.name.identifier
 }
