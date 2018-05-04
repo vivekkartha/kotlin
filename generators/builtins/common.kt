@@ -66,3 +66,4 @@ fun areEqualNumbers(v: String) = "$v == other.$v"
 
 fun hashLong(v: String) = "($v xor ($v ushr 32))"
 
+fun convert(v: String, from: UnsignedType, to: UnsignedType) = if (from == to) v else "$v.to${to.capitalized}()"
