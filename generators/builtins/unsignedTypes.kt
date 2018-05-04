@@ -84,7 +84,13 @@ class UnsignedTypeGenerator(val type: UnsignedType, out: PrintWriter) : BuiltIns
      */""")
             out.print("    public ")
             if (otherType == type) out.print("override ")
-            out.println("operator fun compareTo(other: ${otherType.capitalized}): Int = TODO()")
+            out.print("operator fun compareTo(other: ${otherType.capitalized}): Int = ")
+            if (otherType == type && maxByDomainCapacity(type, UnsignedType.UINT) == type) {
+                out.println("${className.toLowerCase()}Compare(this.data, other.data)")
+            } else {
+                val ctype = maxByDomainCapacity(maxByDomainCapacity(type, otherType), UnsignedType.UINT).capitalized
+                out.println("this.to$ctype().compareTo(other.to$ctype())")
+            }
         }
         out.println()
     }
