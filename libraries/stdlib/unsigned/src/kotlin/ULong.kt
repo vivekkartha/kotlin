@@ -28,21 +28,21 @@ public inline class ULong internal constructor(private val data: Long) : Compara
      * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
      * or a positive number if it's greater than other.
      */
-    public operator fun compareTo(other: UByte): Int = this.toULong().compareTo(other.toULong())
+    public operator fun compareTo(other: UByte): Int = this.compareTo(other.toULong())
 
     /**
      * Compares this value with the specified value for order.
      * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
      * or a positive number if it's greater than other.
      */
-    public operator fun compareTo(other: UShort): Int = this.toULong().compareTo(other.toULong())
+    public operator fun compareTo(other: UShort): Int = this.compareTo(other.toULong())
 
     /**
      * Compares this value with the specified value for order.
      * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
      * or a positive number if it's greater than other.
      */
-    public operator fun compareTo(other: UInt): Int = this.toULong().compareTo(other.toULong())
+    public operator fun compareTo(other: UInt): Int = this.compareTo(other.toULong())
 
     /**
      * Compares this value with the specified value for order.

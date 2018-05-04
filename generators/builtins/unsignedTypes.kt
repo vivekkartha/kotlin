@@ -92,8 +92,8 @@ class UnsignedTypeGenerator(val type: UnsignedType, out: PrintWriter) : BuiltIns
             if (otherType == type && maxByDomainCapacity(type, UnsignedType.UINT) == type) {
                 out.println("${className.toLowerCase()}Compare(this.data, other.data)")
             } else {
-                val ctype = maxByDomainCapacity(maxByDomainCapacity(type, otherType), UnsignedType.UINT).capitalized
-                out.println("this.to$ctype().compareTo(other.to$ctype())")
+                val ctype = maxByDomainCapacity(maxByDomainCapacity(type, otherType), UnsignedType.UINT)
+                out.println("${convert("this", type, ctype)}.compareTo(${convert("other", otherType, ctype)})")
             }
         }
         out.println()

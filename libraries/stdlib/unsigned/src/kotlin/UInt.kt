@@ -28,14 +28,14 @@ public inline class UInt internal constructor(private val data: Int) : Comparabl
      * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
      * or a positive number if it's greater than other.
      */
-    public operator fun compareTo(other: UByte): Int = this.toUInt().compareTo(other.toUInt())
+    public operator fun compareTo(other: UByte): Int = this.compareTo(other.toUInt())
 
     /**
      * Compares this value with the specified value for order.
      * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
      * or a positive number if it's greater than other.
      */
-    public operator fun compareTo(other: UShort): Int = this.toUInt().compareTo(other.toUInt())
+    public operator fun compareTo(other: UShort): Int = this.compareTo(other.toUInt())
 
     /**
      * Compares this value with the specified value for order.
@@ -49,7 +49,7 @@ public inline class UInt internal constructor(private val data: Int) : Comparabl
      * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
      * or a positive number if it's greater than other.
      */
-    public operator fun compareTo(other: ULong): Int = this.toULong().compareTo(other.toULong())
+    public operator fun compareTo(other: ULong): Int = this.toULong().compareTo(other)
 
     /** Adds the other value to this value. */
     public operator fun plus(other: UByte): UInt = this.plus(other.toUInt())
