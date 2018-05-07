@@ -565,7 +565,12 @@ val zipPlugin by task<Zip> {
 val cidrPlugin by task<Copy> {
     dependsOn(ideaPlugin)
     into(cidrPluginDir)
-    from(ideaPluginDir) { exclude("lib/kotlin-plugin.jar") }
+    from(ideaPluginDir) {
+        exclude("lib/kotlin-plugin.jar")
+        exclude("lib/lint.jar")
+        exclude("lib/uast-kotlin.jar")
+        exclude("lib/uast-kotlin-idea.jar")
+    }
     from(cidrKotlinPlugin) { into("lib") }
 }
 
