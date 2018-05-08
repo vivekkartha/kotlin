@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.idea.quickfix
 
 import com.intellij.codeInsight.intention.IntentionAction
-import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.cfg.pseudocode.containingDeclarationForPseudocode
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
@@ -15,12 +14,12 @@ import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
 import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters2
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.core.toDescriptor
+import org.jetbrains.kotlin.idea.util.projectStructure.module
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.resolve.AnnotationChecker
 import org.jetbrains.kotlin.resolve.BindingContext.FQNAME_TO_CLASS_DESCRIPTOR
@@ -64,6 +63,13 @@ object ExperimentalFixesFactory : KotlinIntentionActionsFactory() {
                     AddAnnotationFix(containingClassOrObject, annotationFqName, " to containing class '${containingClassOrObject.name}'")
                 )
             }
+        }
+        val containingFile = containingDeclaration.containingKtFile
+        val module = containingFile.module
+        if (module != null) {
+            result.add(
+                MakeModuleExperimentalFix(containingFile, module, annotationFqName)
+            )
         }
 
         return result
