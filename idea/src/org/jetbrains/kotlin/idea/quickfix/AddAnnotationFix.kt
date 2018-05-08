@@ -15,13 +15,14 @@ import org.jetbrains.kotlin.psi.KtFile
 open class AddAnnotationFix(
     element: KtDeclaration,
     private val annotationFqName: FqName,
-    private val suffix: String = ""
+    private val suffix: String = "",
+    private val arguments: String? = null
 ) : KotlinQuickFixAction<KtDeclaration>(element) {
     override fun getText(): String = "Add '@${annotationFqName.shortName()}' annotation$suffix"
 
     override fun getFamilyName(): String = "Add annotation"
 
     override fun invoke(project: Project, editor: Editor?, file: KtFile) {
-        element?.addAnnotation(annotationFqName)
+        element?.addAnnotation(annotationFqName, annotationInnerText = arguments)
     }
 }

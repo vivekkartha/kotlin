@@ -25,6 +25,8 @@ import org.jetbrains.kotlin.resolve.AnnotationChecker
 import org.jetbrains.kotlin.resolve.BindingContext.FQNAME_TO_CLASS_DESCRIPTOR
 
 object ExperimentalFixesFactory : KotlinIntentionActionsFactory() {
+    private val USE_EXPERIMENTAL_FQ_NAME = FqName("kotlin.UseExperimental")
+
     override fun doCreateActions(diagnostic: Diagnostic): List<IntentionAction> {
         val element = diagnostic.psiElement
         val containingDeclaration: KtDeclaration = when (element) {
@@ -53,15 +55,23 @@ object ExperimentalFixesFactory : KotlinIntentionActionsFactory() {
         }
 
         val result = mutableListOf<IntentionAction>()
-        if (isApplicableTo(containingDeclaration, applicableTargets)) {
-            result.add(AddAnnotationFix(containingDeclaration, annotationFqName, " to '${containingDeclaration.name}'"))
+        val useExperimentalArgs = "$annotationFqName::class"
+        run {
+            val suffix = " to '${containingDeclaration.name}'"
+            if (isApplicableTo(containingDeclaration, applicableTargets)) {
+                result.add(AddAnnotationFix(containingDeclaration, annotationFqName, suffix))
+            }
+            result.add(AddAnnotationFix(containingDeclaration, USE_EXPERIMENTAL_FQ_NAME, suffix, useExperimentalArgs))
         }
         if (containingDeclaration is KtCallableDeclaration) {
             val containingClassOrObject = containingDeclaration.containingClassOrObject
-            if (containingClassOrObject != null && isApplicableTo(containingClassOrObject, applicableTargets)) {
-                result.add(
-                    AddAnnotationFix(containingClassOrObject, annotationFqName, " to containing class '${containingClassOrObject.name}'")
-                )
+            if (containingClassOrObject != null) {
+                val suffix = " to containing class '${containingClassOrObject.name}'"
+                if (isApplicableTo(containingClassOrObject, applicableTargets)) {
+                    result.add(AddAnnotationFix(containingClassOrObject, annotationFqName, suffix))
+                } else {
+                    result.add(AddAnnotationFix(containingClassOrObject, USE_EXPERIMENTAL_FQ_NAME, suffix, useExperimentalArgs))
+                }
             }
         }
         val containingFile = containingDeclaration.containingKtFile

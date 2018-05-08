@@ -3,6 +3,8 @@
 // WITH_RUNTIME
 // ACTION: Add '@MyExperimentalAPI' annotation to 'foo'
 // ACTION: Add '-Xuse-experimental=MyExperimentalAPI' to module light_idea_test_case compiler arguments
+// ACTION: Add '@UseExperimental' annotation to 'foo'
+// ACTION: Add '@UseExperimental' annotation to containing class 'Derived'
 // ERROR: This declaration overrides experimental member of supertype 'Base' and must be annotated with '@MyExperimentalAPI'
 
 @Experimental
