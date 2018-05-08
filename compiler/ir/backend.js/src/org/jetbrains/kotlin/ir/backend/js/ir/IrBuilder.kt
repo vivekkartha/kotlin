@@ -47,17 +47,17 @@ object JsIrBuilder {
     fun buildSetVariable(symbol: IrVariableSymbol, value: IrExpression) =
         IrSetVariableImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, value, SYNTHESIZED_STATEMENT)
 
-    fun buildGetField(symbol: IrFieldSymbol, receiver: IrExpression? = null, superQualifierSymbol: IrClassSymbol? = null) =
+    fun buildGetField(symbol: IrFieldSymbol, receiver: IrExpression?, superQualifierSymbol: IrClassSymbol? = null) =
         IrGetFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, receiver, SYNTHESIZED_STATEMENT, superQualifierSymbol)
 
     fun buildSetField(symbol: IrFieldSymbol, receiver: IrExpression?, value: IrExpression, superQualifierSymbol: IrClassSymbol? = null) =
         IrSetFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, receiver, value, SYNTHESIZED_STATEMENT, superQualifierSymbol)
 
-    fun buildBlockBody(stmts: List<IrStatement>) = IrBlockBodyImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, stmts)
+    fun buildBlockBody(statements: List<IrStatement>) = IrBlockBodyImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, statements)
 
     fun buildBlock(type: KotlinType) = IrBlockImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, type, SYNTHESIZED_STATEMENT)
-    fun buildBlock(type: KotlinType, stmts: List<IrStatement>) =
-        IrBlockImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, type, SYNTHESIZED_STATEMENT, stmts)
+    fun buildBlock(type: KotlinType, statements: List<IrStatement>) =
+        IrBlockImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, type, SYNTHESIZED_STATEMENT, statements)
 
     fun buildFunctionReference(type: KotlinType, symbol: IrFunctionSymbol) =
         IrFunctionReferenceImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, type, symbol, symbol.descriptor)
@@ -73,6 +73,4 @@ object JsIrBuilder {
 
     fun buildNull(type: KotlinType) = IrConstImpl.constNull(UNDEFINED_OFFSET, UNDEFINED_OFFSET, type)
     fun buildBoolean(type: KotlinType, v: Boolean) = IrConstImpl.boolean(UNDEFINED_OFFSET, UNDEFINED_OFFSET, type, v)
-
-//    fun buildTypeOperator() = IrTypeOperatorCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, )
 }
