@@ -7,7 +7,7 @@
 
 package kotlin
 
-inline class ULongArray internal constructor(private val storage: LongArray) : Collection<ULong> {
+public inline class ULongArray internal constructor(private val storage: LongArray) : Collection<ULong> {
 
     /** Returns the array element at the given [index]. This method can be called using the index operator. */
     public operator fun get(index: Int): ULong = storage[index].toULong()

@@ -7,7 +7,7 @@
 
 package kotlin
 
-inline class UByteArray internal constructor(private val storage: ByteArray) : Collection<UByte> {
+public inline class UByteArray internal constructor(private val storage: ByteArray) : Collection<UByte> {
 
     /** Returns the array element at the given [index]. This method can be called using the index operator. */
     public operator fun get(index: Int): UByte = storage[index].toUByte()

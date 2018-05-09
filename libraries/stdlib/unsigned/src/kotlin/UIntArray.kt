@@ -7,7 +7,7 @@
 
 package kotlin
 
-inline class UIntArray internal constructor(private val storage: IntArray) : Collection<UInt> {
+public inline class UIntArray internal constructor(private val storage: IntArray) : Collection<UInt> {
 
     /** Returns the array element at the given [index]. This method can be called using the index operator. */
     public operator fun get(index: Int): UInt = storage[index].toUInt()

@@ -257,7 +257,7 @@ class UnsignedArrayGenerator(val type: UnsignedType, out: PrintWriter) : BuiltIn
     val storageElementType = type.asSigned.capitalized
     val storageArrayType = storageElementType + "Array"
     override fun generateBody() {
-        out.println("inline class $arrayType internal constructor(private val storage: $storageArrayType) : Collection<$elementType> {")
+        out.println("public inline class $arrayType internal constructor(private val storage: $storageArrayType) : Collection<$elementType> {")
         out.println(
             """
     /** Returns the array element at the given [index]. This method can be called using the index operator. */

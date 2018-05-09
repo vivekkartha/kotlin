@@ -7,7 +7,7 @@
 
 package kotlin
 
-inline class UShortArray internal constructor(private val storage: ShortArray) : Collection<UShort> {
+public inline class UShortArray internal constructor(private val storage: ShortArray) : Collection<UShort> {
 
     /** Returns the array element at the given [index]. This method can be called using the index operator. */
     public operator fun get(index: Int): UShort = storage[index].toUShort()
