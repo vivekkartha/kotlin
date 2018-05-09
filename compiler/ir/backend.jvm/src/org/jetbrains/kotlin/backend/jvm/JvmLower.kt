@@ -49,6 +49,7 @@ class JvmLower(val context: JvmBackendContext) {
         InnerClassesLowering(context).runOnFilePostfix(irFile)
         InnerClassConstructorCallsLowering(context).runOnFilePostfix(irFile)
 
+        irFile.acceptVoid(PatchDeclarationParentsVisitor())
         LocalDeclarationsLowering(
             context,
             object : LocalNameProvider {
@@ -58,7 +59,6 @@ class JvmLower(val context: JvmBackendContext) {
             Visibilities.PUBLIC
         ).runOnFilePostfix(irFile)
 
-        irFile.acceptVoid(PatchDeclarationParentsVisitor())
         EnumClassLowering(context).runOnFilePostfix(irFile)
         //Should be before SyntheticAccessorLowering cause of synthetic accessor for companion constructor
         ObjectClassLowering(context).lower(irFile)
