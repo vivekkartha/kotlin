@@ -8,9 +8,24 @@ external interface Foo {
 
 interface Bar : Foo
 
-class DDD : Bar {
+class CCC: Foo
 
+class DDD: Bar
+
+interface Bar2: Foo {
+    override var externalProperty: String?
+        get() = "Bar2"
+        set(value) {}
 }
 
-// Note: since nashorn gets crashed if bug exists there is no need for specific body
-fun box() = "OK"
+class FFF: Bar2
+
+fun box(): String {
+    val c = CCC()
+    if (c.externalProperty != null) return "fail1"
+    val d = DDD()
+    if (d.externalProperty != null) return "fail2"
+    val f = FFF()
+    if (f.externalProperty != "Bar2") return "fail3"
+    return "OK"
+}
