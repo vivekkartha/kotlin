@@ -515,6 +515,46 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
             return KeptResult
         }
 
+        override fun visitVararg(expression: IrVararg, data: VisitData): VisitResult {
+            var decomposed = 0
+
+            val arguments = expression.elements.map {
+                val expr = (it as? IrSpreadElement)?.expression ?: it as IrExpression
+                Pair(it, expr.accept(this, data).execute { decomposed++ })
+            }
+
+            if (decomposed == 0) return KeptResult
+
+            val newStatements = mutableListOf<IrStatement>()
+            val newArguments = arguments.map { (original, result) ->
+                if (decomposed == 0) original
+                else {
+                    val originalExpression = (original as? IrSpreadElement)?.expression ?: original as IrExpression
+                    val newExpression = result.evaluate(originalExpression) {
+                        newStatements += statements
+                        decomposed--
+                        resultValue
+                    }
+                    val wrapVar = makeTempVar(expression.varargElementType)
+                    newStatements += JsIrBuilder.buildVar(wrapVar).apply { initializer = newExpression }
+                    val newValue = JsIrBuilder.buildGetValue(wrapVar)
+                    (original as? IrSpreadElement)?.run { IrSpreadElementImpl(startOffset, endOffset, newValue) } ?: newValue
+                }
+            }
+
+            val newExpression = IrVarargImpl(
+                expression.startOffset,
+                expression.endOffset,
+                expression.type,
+                expression.varargElementType,
+                newArguments)
+
+            val resultVar = makeTempVar(expression.type)
+            newStatements += JsIrBuilder.buildVar(resultVar).apply { initializer = newExpression }
+
+            return DecomposedResult(newStatements, resultVar)
+        }
+
         override fun visitStringConcatenation(expression: IrStringConcatenation, data: VisitData): VisitResult {
             var decomposed = 0
 
@@ -527,7 +567,7 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
             val newStatements = mutableListOf<IrStatement>()
             val newArguments = mapArguments(arguments, decomposed, newStatements)
             val newExpression =
-                IrStringConcatenationImpl(expression.startOffset, expression.endOffset, expression.type, newArguments as List<IrExpression>)
+                IrStringConcatenationImpl(expression.startOffset, expression.endOffset, expression.type, newArguments.map { it!! })
 
             val resultVar = makeTempVar(expression.type)
             newStatements += JsIrBuilder.buildVar(resultVar).apply { initializer = newExpression }

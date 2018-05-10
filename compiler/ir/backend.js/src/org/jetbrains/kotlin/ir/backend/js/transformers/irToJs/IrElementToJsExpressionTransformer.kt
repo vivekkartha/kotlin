@@ -21,6 +21,52 @@ import org.jetbrains.kotlin.util.OperatorNameConventions
 
 class IrElementToJsExpressionTransformer : BaseIrElementToJsNodeTransformer<JsExpression, JsGenerationContext> {
 
+    override fun visitVararg(expression: IrVararg, context: JsGenerationContext): JsExpression {
+        if (expression.elements.size == 1) {
+            val element = expression.elements[0]
+            if (element is IrSpreadElement) {
+                // special case, invoke slice()
+                val expr = element.expression.accept(this, context)
+                return JsInvocation(JsNameRef(Namer.SLICE_FUNCTION, expr))
+            }
+        }
+
+        var arrayLiteralElements = mutableListOf<JsExpression>()
+        val concatArguments = mutableListOf<JsExpression>()
+        var qualifier: JsExpression? = null
+
+        expression.elements.forEach {
+            if (it is IrSpreadElement) {
+                val expr = it.expression.accept(this, context)
+                if (qualifier == null) {
+                    if (arrayLiteralElements.isEmpty()) {
+                        qualifier = JsNameRef(Namer.CONCAT_FUNCTION, expr)
+                    } else {
+                        val dispatch = JsArrayLiteral(arrayLiteralElements)
+                        arrayLiteralElements = mutableListOf()
+                        qualifier = JsNameRef(Namer.CONCAT_FUNCTION, dispatch)
+                        concatArguments.add(expr)
+                    }
+                } else {
+                    if (arrayLiteralElements.isNotEmpty()) {
+                        concatArguments.add(JsArrayLiteral(arrayLiteralElements))
+                        arrayLiteralElements = mutableListOf()
+                    }
+                    concatArguments.add(expr)
+                }
+            } else {
+                arrayLiteralElements.add(it.accept(this, context))
+            }
+        }
+
+        val tail = if (arrayLiteralElements.isNotEmpty()) listOf(JsArrayLiteral(arrayLiteralElements)) else emptyList()
+
+        return qualifier?.let {
+            concatArguments.addAll(tail)
+            return JsInvocation(it, concatArguments)
+        } ?: tail.first()
+    }
+
     override fun visitExpressionBody(body: IrExpressionBody, context: JsGenerationContext): JsExpression =
         body.expression.accept(this, context)
 

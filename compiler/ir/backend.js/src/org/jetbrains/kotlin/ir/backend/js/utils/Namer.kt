@@ -34,6 +34,9 @@ object Namer {
     val CALL_FUNCTION = "call"
     val APPLY_FUNCTION = "apply"
 
+    val SLICE_FUNCTION = "slice"
+    val CONCAT_FUNCTION = "concat"
+
     val OUTER_FIELD_NAME = "\$outer"
 
     val DELEGATE = "\$delegate"
