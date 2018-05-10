@@ -509,7 +509,10 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
                 resultList.apply { add(JsIrBuilder.buildSetVariable(collectiveVar, newResult)) }
             }
 
-            return DecomposedResult(mutableListOf(varDeclaration, newWhen), collectiveVar)
+            if (newWhen != expression) {
+                return DecomposedResult(mutableListOf(varDeclaration, newWhen), collectiveVar)
+            }
+            return KeptResult
         }
 
         override fun visitStringConcatenation(expression: IrStringConcatenation, data: VisitData): VisitResult {
@@ -594,8 +597,8 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
             Pair(conditionResult, bodyResult)
         }
 
-        // keep it as Is
-        if (expressionVisitor != statementVisitor && !(needNewConds || needNewBodies)) return expression
+        // keep it as is
+        if (!(needNewConds || needNewBodies)) return expression
 
         val unitType = context.builtIns.unitType
 
