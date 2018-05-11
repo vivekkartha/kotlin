@@ -13,7 +13,7 @@ enum class JVMAssertionsMode(val description: String) {
 
     companion object {
         @JvmField
-        val DEFAULT = ALWAYS_ENABLE
+        val DEFAULT = LEGACY
 
         @JvmStatic
         fun fromStringOrNull(string: String?) = values().find { it.description == string }

@@ -124,11 +124,11 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
     @Argument(
         value = "-Xassertions", valueDescription = "{always-enable|always-disable|jvm|legacy}",
         description = "Assert calls behaviour\n" +
-                "-Xassertions=always-enable:  enable, ignore -ea;\n" +
-                "-Xassertions=always-disable: disable, ignore -ea;\n" +
-                "-Xassertions=jvm:            enable, depends on -ea;\n" +
-                "-Xassertions=legacy:         calculate condition on each call, check depends on -ea on kotlin package\n" +
-                "default: always-enable"
+                "-Xassertions=always-enable:  enable, ignore jvm assertion settings;\n" +
+                "-Xassertions=always-disable: disable, ignore jvm assertion settings;\n" +
+                "-Xassertions=jvm:            enable, depend on jvm assertion settings;\n" +
+                "-Xassertions=legacy:         calculate condition on each call, check depends on jvm assertion settings in the kotlin package;\n" +
+                "default: legacy"
     )
     var assertionsMode: String? by FreezableVar(JVMAssertionsMode.DEFAULT.description)
 
