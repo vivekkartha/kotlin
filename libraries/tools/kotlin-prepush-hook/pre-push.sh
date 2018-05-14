@@ -4,6 +4,11 @@ targetRepo="$2"
 
 remoteRefs=""
 
+if [[ ! -f "./libraries/tools/kotlin-prepush-hook/src/KotlinPrePushHook.java" ]]; then
+    echo "Pre-commit hook .java file was not found in current branch, pre-push hook is disabled"
+    exit 0
+fi
+
 if [[ -z "$(command -v java)" ]]; then
     echo "'java' was not found, pre-push hook is disabled"
     exit 0
