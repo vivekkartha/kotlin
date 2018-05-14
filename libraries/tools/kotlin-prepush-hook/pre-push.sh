@@ -42,10 +42,10 @@ fi
 echo $remoteRefs
 
 mkdir -p ./build/prePushHook
-$javacPath -d ./build/prePushHook ./libraries/tools/kotlin-prepush-hook/src/KotlinPrePushHook.java
+"$javacPath" -d ./build/prePushHook ./libraries/tools/kotlin-prepush-hook/src/KotlinPrePushHook.java
 cd ./build/prePushHook
 
-$javaPath KotlinPrePushHook $remoteRefs $targetRepo
+"$javaPath" KotlinPrePushHook $remoteRefs $targetRepo
 returnCode=$?
 
 cd ../..
