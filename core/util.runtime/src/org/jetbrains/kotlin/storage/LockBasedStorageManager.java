@@ -527,14 +527,6 @@ public class LockBasedStorageManager implements StorageManager {
     }
 
     @NotNull
-    public static LockBasedStorageManager createDelegatingWithSameLock(
-            @NotNull LockBasedStorageManager base,
-            @NotNull ExceptionHandlingStrategy newStrategy
-    ) {
-        return new LockBasedStorageManager(defaultDebugName(), newStrategy, base.lock);
-    }
-
-    @NotNull
     private static <T extends Throwable> T sanitizeStackTrace(@NotNull T throwable) {
         StackTraceElement[] stackTrace = throwable.getStackTrace();
         int size = stackTrace.length;
