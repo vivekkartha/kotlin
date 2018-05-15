@@ -102,6 +102,38 @@ class KtLightAnnotationTest : KotlinLightCodeInsightFixtureTestCase() {
         assertTextAndRange("InnerAnnotation()", annotationAttributeVal)
     }
 
+    fun testConstants() {
+        myFixture.addClass(
+            """
+            public @interface StringAnnotation {
+                  String value();
+            }
+        """.trimIndent()
+        )
+        myFixture.addClass(
+            """
+            public class Constants {
+
+                public static final String MY_CONSTANT = "67";
+            }
+
+        """.trimIndent()
+        )
+
+        myFixture.configureByText(
+            "AnnotatedClass.kt", """
+            @StringAnnotation(Constants.MY_CONSTANT)
+            open class AnnotatedClass
+        """.trimIndent()
+        )
+        myFixture.testHighlighting("AnnotatedClass.kt")
+
+        val annotations = myFixture.findClass("AnnotatedClass").expectAnnotations(1)
+        val annotationAttributeVal = annotations.first().findAttributeValue("value") as PsiLiteral
+        assertTextAndRange("Constants.MY_CONSTANT", annotationAttributeVal)
+        TestCase.assertEquals("67", annotationAttributeVal.value)
+    }
+
     fun testAnnotationsInAnnotationsArrayDeclarations() {
         myFixture.addClass("""
             public @interface OuterAnnotation {

@@ -327,7 +327,7 @@ private fun KtElement.getResolvedCall(): ResolvedCall<out CallableDescriptor>? {
     return this.getResolvedCall(context)
 }
 
-fun convertToLightAnnotationMemberValue(lightParent: PsiElement, argument: KtExpression): PsiAnnotationMemberValue? {
+fun convertToLightAnnotationMemberValue(lightParent: PsiElement, argument: KtExpression): PsiAnnotationMemberValue {
     val argument = unwrapCall(argument)
     when (argument) {
         is KtStringTemplateExpression, is KtConstantExpression -> {
@@ -363,7 +363,8 @@ fun convertToLightAnnotationMemberValue(lightParent: PsiElement, argument: KtExp
                     { self -> arguments.mapNotNull { convertToLightAnnotationMemberValue(self, it) } })
         }
     }
-    return null
+    // everything else (like complex constant references) considered as PsiLiteral-s
+    return KtLightPsiLiteral(argument, lightParent)
 }
 
 private val KtExpression.nameReference: KtNameReferenceExpression?
