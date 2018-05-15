@@ -11,7 +11,9 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.descriptors.JsSymbolBuilder
+import org.jetbrains.kotlin.ir.backend.js.descriptors.initialize
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
+import org.jetbrains.kotlin.ir.backend.js.utils.Namer
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
@@ -35,6 +37,8 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
     val constTrue = JsIrBuilder.buildBoolean(context.builtIns.booleanType, true)
     val constFalse = JsIrBuilder.buildBoolean(context.builtIns.booleanType, false)
     val nothingType = context.builtIns.nullableNothingType
+
+    val unreachableFunction = JsSymbolBuilder.buildSimpleFunction(context.module, Namer.UNREACHABLE_NAME).initialize(type = nothingType)
 
     override fun lower(irFunction: IrFunction) {
         function = irFunction
@@ -185,7 +189,6 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
         //
         // is transformed into
         //
-        // c_block_vars { var tmp1; ...; var tmpn }
         // while (true) {
         //   var cond = c_block {}
         //   if (!cond) break
@@ -231,7 +234,6 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
         //
         // is transformed into
         //
-        // c_block_vars { var tmp1; ...; var tmpn; var cond; }
         // do {
         //   do {
         //     body {}
@@ -527,7 +529,7 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
             val newStatements = mutableListOf<IrStatement>()
             val newArguments = mapArguments(arguments, decomposed, newStatements)
             val newExpression =
-                IrStringConcatenationImpl(expression.startOffset, expression.endOffset, expression.type, newArguments as List<IrExpression>)
+                IrStringConcatenationImpl(expression.startOffset, expression.endOffset, expression.type, newArguments.map { it!! })
 
             val resultVar = makeTempVar(expression.type)
             newStatements += JsIrBuilder.buildVar(resultVar).apply { initializer = newExpression }
@@ -546,11 +548,12 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
             val aggregateVar = makeTempVar(nothingType)
 
             val returnValue = valueResult.evaluate(value) {
-                resultValue.apply { newStatements += statements }
+                newStatements += statements
+                resultValue
             }
 
             newStatements += instantiater(returnValue)
-            newStatements += JsIrBuilder.buildVar(aggregateVar).apply { initializer = JsIrBuilder.buildNull(nothingType) }
+            newStatements += JsIrBuilder.buildVar(aggregateVar).apply { initializer = JsIrBuilder.buildCall(unreachableFunction) }
 
             return TerminatedResult(newStatements, aggregateVar)
         }
@@ -570,7 +573,7 @@ class BlockDecomposerLowering(val context: JsIrBackendContext) : FunctionLowerin
 
         override fun visitBreakContinue(jump: IrBreakContinue, data: VisitData): VisitResult {
             val aggregateVar = makeTempVar(jump.type)
-            val irVarDeclaration = JsIrBuilder.buildVar(aggregateVar).apply { initializer = JsIrBuilder.buildNull(jump.type) }
+            val irVarDeclaration = JsIrBuilder.buildVar(aggregateVar).apply { initializer = JsIrBuilder.buildCall(unreachableFunction) }
             return DecomposedResult(mutableListOf(jump, irVarDeclaration), aggregateVar)
         }
 
