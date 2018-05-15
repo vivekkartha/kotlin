@@ -11578,6 +11578,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
                 runTest("compiler/testData/codegen/box/multiplatform/defaultArguments/inheritedFromExpectedClass.kt");
             }
 
+            @TestMetadata("inheritedFromExpectedInterface.kt")
+            public void testInheritedFromExpectedInterface() throws Exception {
+                runTest("compiler/testData/codegen/box/multiplatform/defaultArguments/inheritedFromExpectedInterface.kt");
+            }
+
             @TestMetadata("inheritedFromExpectedMethod.kt")
             public void testInheritedFromExpectedMethod() throws Exception {
                 runTest("compiler/testData/codegen/box/multiplatform/defaultArguments/inheritedFromExpectedMethod.kt");
